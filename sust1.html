@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'" />
+  <title>Declina! · Casos de la 1.ª declinación</title>
+  <style>
+    /* ---------- Variables y reset ---------- */
+    :root {
+      --primary: #1976d2;
+      --primary-dark: #1565c0;
+      --focus: #0d47a1;
+      --success-bg: #2e7d32;
+      --success-light: #c8e6c9;
+      --error-bg: #c62828;
+      --error-light: #ffcdd2;
+      --bg-color: #f0f2f5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-color);
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+
+    h1 { text-align: center; font-size: 1.5rem; margin-bottom: 1rem; color: #111; }
+    h2 { font-size: 1.3rem; margin-bottom: 1rem; color: #111; }
+
+    .instructions {
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+      color: #555;
+      text-align: center;
+    }
+
+    /* ---------- Lector de pantalla ---------- */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+    }
+
+    /* ---------- Pantallas (inicio / cierre) ---------- */
+    .screen-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 2rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .screen-card h1 { margin-bottom: 0.5rem; }
+    .lead { text-align: center; color: #555; margin-bottom: 1.5rem; }
+
+    .how-list { list-style: none; margin: 0 0 1.5rem; padding: 0; }
+    .how-list li {
+      display: flex;
+      gap: 0.7rem;
+      align-items: flex-start;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #eee;
+      font-size: 0.95rem;
+    }
+    .how-list li:last-child { border-bottom: none; }
+    .how-num {
+      flex: 0 0 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .completion-screen { text-align: center; }
+    .completion-screen .completion-summary { margin: 0.5rem 0 1.5rem; color: #555; }
+
+    /* ---------- Botón primario ---------- */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(25,118,210,0.3);
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+    /* ---------- Cabecera fija y progreso ---------- */
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-color);
+      padding: 1rem 0;
+      z-index: 100;
+      border-bottom: 2px solid #ddd;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background-color: var(--success-bg);
+      width: 0%;
+      transition: width 0.4s ease-out;
+    }
+
+    .sentence-es { font-weight: 600; margin-bottom: 0.6rem; font-size: 1.05rem; }
+    .es-num { font-weight: 700; margin-right: 0.3rem; }
+    .es-chunk {
+      display: inline-block;
+      background: #eef1f4;
+      border-radius: 6px;
+      padding: 0.1rem 0.5rem;
+      margin: 0.15rem 0.15rem;
+    }
+    .es-chunk.es-verb { color: var(--primary); font-weight: 700; background: #e3f2fd; }
+
+    .sentence-la-current { font-size: 1.2rem; }
+
+    /* ---------- Bloques de palabras ---------- */
+    .chunk-row { display: flex; flex-direction: column; gap: 1.5rem; }
+    @media (min-width: 600px) {
+      .chunk-row { flex-direction: row; flex-wrap: wrap; }
+      .chunk { flex: 1 1 calc(50% - 1rem); }
+    }
+    .chunk {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .chunk-label { font-weight: 700; font-size: 1.1rem; color: var(--primary); margin-bottom: 0.2rem; }
+    .case-target { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
+
+    /* ---------- Tablas ---------- */
+    .decl-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .decl-table th, .decl-table td { border: 1px solid #ccc; text-align: center; }
+    .decl-table th { background: #f8f9fa; font-weight: 600; padding: 0.8rem 0.4rem; }
+
+    .case-cell { font-weight: bold; background: #f1f3f5; font-size: 0.85rem; padding: 0.8rem 0.4rem; }
+    .case-abbr { display: block; }
+    .case-help { display: block; font-size: 0.7rem; color: #666; font-weight: normal; }
+
+    .form-td { padding: 0; }
+    .form-cell {
+      display: block;
+      width: 100%;
+      font: inherit;
+      color: inherit;
+      background: transparent;
+      border: none;
+      padding: 0.8rem 0.4rem;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .form-cell:hover { background: #e3f2fd; }
+    .form-cell:active { transform: scale(0.95); }
+    .form-cell:focus-visible { outline: 3px solid var(--primary); outline-offset: -3px; }
+
+    .form-cell.cell-correct { background: var(--success-bg); color: #fff; font-weight: 700; }
+    .form-cell.cell-correct::after { content: '✓'; margin-left: 0.35rem; font-weight: 700; }
+    .form-cell.cell-incorrect { background: var(--error-light); color: var(--error-bg); }
+    .form-cell.cell-incorrect .form-text { text-decoration: line-through; }
+    .form-cell.cell-incorrect::after { content: '✗'; margin-left: 0.35rem; font-weight: 700; }
+
+    /* ---------- Pista pedagógica ---------- */
+    .feedback-hint {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      display: none;
+      font-weight: 500;
+      animation: fadeIn 0.3s;
+    }
+    .feedback-hint.error {
+      display: block;
+      background: var(--error-light);
+      color: var(--error-bg);
+      border-left: 4px solid var(--error-bg);
+    }
+
+    /* ---------- Huecos de la oración ---------- */
+    .latin-slot {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      margin: 0 0.2rem;
+      transition: all 0.3s;
+    }
+    .latin-slot-empty { background: #e0e0e0; color: #777; min-width: 60px; text-align: center; }
+    .latin-slot-correct { background: var(--success-light); color: var(--success-bg); font-weight: bold; }
+    .latin-slot-incorrect { background: var(--error-light); color: var(--error-bg); text-decoration: line-through; }
+    .latin-verb { color: var(--primary); font-weight: 700; }
+
+    .completion-check {
+      display: inline-block;
+      font-size: 1.4rem;
+      margin-left: 0.5rem;
+      animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+    /* ---------- Botón siguiente ---------- */
+    .next-btn { display: none; margin-top: 2rem; }
+    .next-btn.visible { display: block; animation: fadeIn 0.5s; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ---------- Ticker ---------- */
+    .ticker-footer {
+      margin-top: 3rem;
+      width: 100%;
+      overflow: hidden;
+      background-color: #e9ecef;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      padding: 0.5rem 0;
+    }
+    .ticker-text {
+      display: inline-block;
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: #555;
+      font-weight: 500;
+      padding-left: 100%;
+      animation: ticker 25s linear infinite;
+    }
+    @keyframes ticker {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* ---------- Movimiento reducido ---------- */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+      .ticker-text { animation: none; padding-left: 0; white-space: normal; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= PANTALLA DE INICIO ================= -->
+  <section class="screen-card" id="start-screen" aria-labelledby="start-title">
+    <h1 id="start-title">Declina!</h1>
+    <p class="lead">Una práctica breve para reconocer los casos de la 1.ª declinación latina.</p>
+    <ul class="how-list">
+      <li><span class="how-num">1</span><span>Leé la oración en español. Cada bloque corresponde a una palabra latina.</span></li>
+      <li><span class="how-num">2</span><span>Pensá la <strong>función sintáctica</strong> de cada palabra (sujeto, complemento directo, etc.) para deducir su caso y número.</span></li>
+      <li><span class="how-num">3</span><span>Tocá en la tabla la forma correcta. Si te equivocás, vas a recibir una pista; cuando completes la oración, avanzás a la siguiente.</span></li>
+      <li><span class="how-num">✍️</span><span>Registrá cualquier duda, observación o inconveniente para resolver en clase.</span></li>
+    </ul>
+    <button class="btn-primary" id="start-btn">Comenzar</button>
+  </section>
+
+  <!-- ================= JUEGO ================= -->
+  <main id="quiz-container" hidden>
+    <h1>Casos de la 1.ª declinación</h1>
+    <p class="instructions">
+      Identificá la <strong>función sintáctica</strong> y tocá la forma correcta en la tabla.
+    </p>
+
+    <div class="sticky-header">
+      <div class="progress-container" id="progress-container" role="progressbar"
+           aria-label="Progreso de la práctica" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <p class="sentence-es" id="sentence-es"></p>
+      <p class="sentence-la-current" id="sentence-la"></p>
+    </div>
+
+    <div class="chunk-row" id="tables-container"></div>
+    <button class="btn-primary next-btn" id="next-btn">¡Correcto! ➔</button>
+  </main>
+
+  <!-- ================= PANTALLA FINAL ================= -->
+  <section class="screen-card completion-screen" id="completion-screen" hidden aria-labelledby="completion-title">
+    <h2 id="completion-title">¡Felicitaciones! 🎉</h2>
+    <p class="completion-summary" id="completion-summary"></p>
+    <button class="btn-primary" id="restart-btn">Volver a empezar</button>
+  </section>
+
+  <!-- Región para anuncios del lector de pantalla -->
+  <div id="sr-status" class="sr-only" aria-live="assertive"></div>
+
+  <footer class="ticker-footer">
+    <div class="ticker-text">
+      Declina! • Recurso didáctico para la cátedra Latín • ISP4 «Ángel Cárcano» • Creado por D. Mazzucchi • Declina! • Recurso didáctico para la cátedra Latín • ISP4 «Ángel Cárcano» • Creado por D. Mazzucchi •
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ============================================================
+       MOTOR DE DECLINACIÓN (1.ª declinación)
+       Las diez formas se generan a partir del tema (lema sin la -a
+       final) más las terminaciones regulares. Las irregularidades
+       se declaran en un único mapa de excepciones.
+       ============================================================ */
+    var FIRST_DECL_ENDINGS = ['a', 'ae', 'ae', 'am', 'ā', 'ae', 'ārum', 'īs', 'ās', 'īs'];
+    // Índices del arreglo: 0 nom.sg · 1 gen.sg · 2 dat.sg · 3 ac.sg · 4 abl.sg
+    //                      5 nom.pl · 6 gen.pl · 7 dat.pl · 8 ac.pl · 9 abl.pl
+    var declExceptions = {
+      'dea': { 7: 'deābus', 9: 'deābus' } // dativo y ablativo plural (frente a deus)
+    };
+
+    function declinar(lemma) {
+      if (typeof lemma !== 'string' || lemma.charAt(lemma.length - 1) !== 'a') {
+        console.warn('Lema no apto para la 1.ª declinación:', lemma);
+        return ['—','—','—','—','—','—','—','—','—','—'];
+      }
+      var stem = lemma.slice(0, -1);
+      var forms = FIRST_DECL_ENDINGS.map(function (e) { return stem + e; });
+      var ex = declExceptions[lemma];
+      if (ex) { Object.keys(ex).forEach(function (i) { forms[i] = ex[i]; }); }
+      return forms;
+    }
+
+    /* ============================================================
+       DATOS (oraciones y palabras). Separados de la lógica:
+       para crear un juego nuevo basta con reemplazar este arreglo.
+       ============================================================ */
+    var items = [
+      {
+        es: ['la esencia', 'de las rosas', 'al navegante', { t: 'conmueve', verb: true }],
+        laWords: [
+          { text: 'essentia', isNoun: true },
+          { text: 'rosārum',  isNoun: true },
+          { text: 'nautam',   isNoun: true },
+          { text: 'movet',    isVerb: true }
+        ],
+        words: [
+          { lemma: 'essentia', gen: 'essentiae', case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'rosa',     gen: 'rosae',     case: 'genitivo plural',     syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'nauta',    gen: 'nautae',    case: 'acusativo singular',  syntaxSpan: 'un complemento directo', slotIndex: 2 }
+        ]
+      },
+      {
+        es: ['en la academia', 'la alumna', 'de Lucrecia', { t: 'pierde', verb: true }, 'el alma'],
+        laWords: [
+          { text: 'in' },
+          { text: 'academia',  isNoun: true },
+          { text: 'discipula', isNoun: true },
+          { text: 'Lucretiae', isNoun: true },
+          { text: 'animam',    isNoun: true },
+          { text: 'perdit',    isVerb: true }
+        ],
+        words: [
+          { lemma: 'academia',  gen: 'academiae',  case: 'ablativo singular',  syntaxSpan: 'un circunstancial', slotIndex: 1 },
+          { lemma: 'discipula', gen: 'discipulae', case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 2 },
+          { lemma: 'Lucretia',  gen: 'Lucretiae',  case: 'genitivo singular',  syntaxSpan: 'un complemento preposicional', slotIndex: 3 },
+          { lemma: 'anima',     gen: 'animae',     case: 'acusativo singular', syntaxSpan: 'un complemento directo', slotIndex: 4 }
+        ]
+      },
+      {
+        es: ['la amiga', 'del agricultor', 'no', { t: 'come', verb: true }, 'hierbas'],
+        laWords: [
+          { text: 'amica',     isNoun: true },
+          { text: 'agricolae', isNoun: true },
+          { text: 'herbās',    isNoun: true },
+          { text: 'non' },
+          { text: 'edit',      isVerb: true }
+        ],
+        words: [
+          { lemma: 'amica',    gen: 'amicae',    case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'agricola', gen: 'agricolae', case: 'genitivo singular',  syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'herba',    gen: 'herbae',    case: 'acusativo plural',   syntaxSpan: 'un complemento directo', slotIndex: 2 }
+        ]
+      },
+      {
+        es: [{ t: 'escucho', verb: true }, 'las melodías', 'de las liras', 'de las diosas'],
+        laWords: [
+          { text: 'melodiās', isNoun: true },
+          { text: 'lirārum',  isNoun: true },
+          { text: 'deārum',   isNoun: true },
+          { text: 'audio',    isVerb: true }
+        ],
+        words: [
+          { lemma: 'melodia', gen: 'melodiae', case: 'acusativo plural', syntaxSpan: 'un complemento directo', slotIndex: 0 },
+          { lemma: 'lira',    gen: 'lirae',    case: 'genitivo plural',  syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'dea',     gen: 'deae',     case: 'genitivo plural',  syntaxSpan: 'un complemento preposicional', slotIndex: 2 }
+        ]
+      },
+      {
+        es: ['la niña', { t: 'rompe', verb: true }, 'la ventana', 'con la flecha'],
+        laWords: [
+          { text: 'puella',    isNoun: true },
+          { text: 'fenestram', isNoun: true },
+          { text: 'sagittā',   isNoun: true },
+          { text: 'frangit',   isVerb: true }
+        ],
+        words: [
+          { lemma: 'puella',   gen: 'puellae',   case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'fenestra', gen: 'fenestrae', case: 'acusativo singular',  syntaxSpan: 'un complemento directo', slotIndex: 1 },
+          { lemma: 'sagitta',  gen: 'sagittae',  case: 'ablativo singular',   syntaxSpan: 'un circunstancial', slotIndex: 2 }
+        ]
+      },
+      {
+        es: ['las vacas', 'de la señora', { t: 'comen', verb: true }, 'en la calle'],
+        laWords: [
+          { text: 'vaccae',  isNoun: true },
+          { text: 'dominae', isNoun: true },
+          { text: 'in' },
+          { text: 'viā',     isNoun: true },
+          { text: 'edunt',   isVerb: true }
+        ],
+        words: [
+          { lemma: 'vacca',  gen: 'vaccae',  case: 'nominativo plural', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'domina', gen: 'dominae', case: 'genitivo singular', syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'via',    gen: 'viae',    case: 'ablativo singular', syntaxSpan: 'un circunstancial', slotIndex: 3 }
+        ]
+      },
+      {
+        es: ['la esclava', 'de Calígula', { t: 'busca', verb: true }, 'una licencia'],
+        laWords: [
+          { text: 'ancilla',   isNoun: true },
+          { text: 'Caligulae', isNoun: true },
+          { text: 'licentiam', isNoun: true },
+          { text: 'quaerit',   isVerb: true }
+        ],
+        words: [
+          { lemma: 'ancilla',  gen: 'ancillae',  case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'Caligula', gen: 'Caligulae', case: 'genitivo singular',  syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'licentia', gen: 'licentiae', case: 'acusativo singular', syntaxSpan: 'un complemento directo', slotIndex: 2 }
+        ]
+      },
+      {
+        es: ['las calles', 'de la envidia', 'no', { t: 'ayudan', verb: true }],
+        laWords: [
+          { text: 'viae',     isNoun: true },
+          { text: 'invidiae', isNoun: true },
+          { text: 'non' },
+          { text: 'iuvant',   isVerb: true }
+        ],
+        words: [
+          { lemma: 'via',     gen: 'viae',     case: 'nominativo plural', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'invidia', gen: 'invidiae', case: 'genitivo singular', syntaxSpan: 'un complemento preposicional', slotIndex: 1 }
+        ]
+      },
+      {
+        es: ['las horas', { t: 'son', verb: true }, 'el alma', 'de la sabiduría'],
+        laWords: [
+          { text: 'horae',      isNoun: true },
+          { text: 'sunt',       isVerb: true },
+          { text: 'anima',      isNoun: true },
+          { text: 'sapientiae', isNoun: true }
+        ],
+        words: [
+          { lemma: 'hora',      gen: 'horae',      case: 'nominativo plural',   syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'anima',     gen: 'animae',     case: 'nominativo singular', syntaxSpan: 'un atributo o predicativo', slotIndex: 2 },
+          { lemma: 'sapientia', gen: 'sapientiae', case: 'genitivo singular',   syntaxSpan: 'un complemento preposicional', slotIndex: 3 }
+        ]
+      },
+      {
+        es: ['la reina', 'de las palomas', { t: 'siente', verb: true }, 'culpa e ira'],
+        laWords: [
+          { text: 'regina',     isNoun: true },
+          { text: 'columbārum', isNoun: true },
+          { text: 'culpam',     isNoun: true },
+          { text: 'et' },
+          { text: 'iram',       isNoun: true },
+          { text: 'sentit',     isVerb: true }
+        ],
+        words: [
+          { lemma: 'regina',  gen: 'reginae',  case: 'nominativo singular', syntaxSpan: 'un sujeto', slotIndex: 0 },
+          { lemma: 'columba', gen: 'columbae', case: 'genitivo plural',     syntaxSpan: 'un complemento preposicional', slotIndex: 1 },
+          { lemma: 'culpa',   gen: 'culpae',   case: 'acusativo singular',  syntaxSpan: 'un complemento directo', slotIndex: 2 },
+          { lemma: 'ira',     gen: 'irae',     case: 'acusativo singular',  syntaxSpan: 'un complemento directo', slotIndex: 4 }
+        ]
+      }
+    ];
+
+    /* ============================================================
+       LÓGICA DEL JUEGO
+       ============================================================ */
+    var caseLabels = ['Nom.', 'Gen.', 'Dat.', 'Ac.', 'Abl.'];
+    var caseHelps  = ['Sujeto', 'C. prep.', 'CI', 'CD', 'Circ.'];
+    var caseNames  = ['nominativo', 'genitivo', 'dativo', 'acusativo', 'ablativo'];
+
+    var currentIndex = 0;
+    var currentSlots = [];
+    var erroredSlots = {};                 // slotIndex -> true si ya hubo error
+    var stats = { total: 0, firstTry: 0 };
+
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Referencias del DOM
+    var elStart       = document.getElementById('start-screen');
+    var elStartBtn    = document.getElementById('start-btn');
+    var elQuiz        = document.getElementById('quiz-container');
+    var elCompletion  = document.getElementById('completion-screen');
+    var elSummary     = document.getElementById('completion-summary');
+    var elRestartBtn  = document.getElementById('restart-btn');
+    var elSentenceEs  = document.getElementById('sentence-es');
+    var elSentenceLa  = document.getElementById('sentence-la');
+    var elTables      = document.getElementById('tables-container');
+    var elNextBtn     = document.getElementById('next-btn');
+    var elProgressBar = document.getElementById('progress-bar');
+    var elProgressBox = document.getElementById('progress-container');
+    var elSrStatus    = document.getElementById('sr-status');
+
+    function totalSlots() {
+      return items.reduce(function (acc, it) { return acc + it.words.length; }, 0);
+    }
+
+    function indexToCase(i, isPlural) {
+      return caseNames[i] + (isPlural ? ' plural' : ' singular');
+    }
+
+    function updateProgress(completed) {
+      var pct = Math.round((completed / items.length) * 100);
+      elProgressBar.style.width = pct + '%';
+      elProgressBox.setAttribute('aria-valuenow', String(pct));
+    }
+
+    function renderSlots() {
+      var item = items[currentIndex];
+      elSentenceLa.textContent = '';
+
+      var prefix = document.createElement('span');
+      prefix.textContent = 'Latín: ';
+      elSentenceLa.appendChild(prefix);
+
+      currentSlots.forEach(function (s) {
+        var span = document.createElement('span');
+        span.className = 'latin-slot';
+        if (s.state === 'empty') {
+          span.classList.add('latin-slot-empty');
+          span.textContent = '_____';
+        } else if (s.state === 'correct') {
+          span.classList.add('latin-slot-correct');
+          span.textContent = s.text;
+        } else if (s.state === 'incorrect') {
+          span.classList.add('latin-slot-incorrect');
+          span.textContent = s.text;
+        } else if (s.state === 'fixed' && s.isVerb) {
+          span.classList.add('latin-verb');
+          span.textContent = s.text;
+        } else {
+          span.textContent = s.text;
+        }
+        elSentenceLa.appendChild(span);
+        elSentenceLa.appendChild(document.createTextNode(' '));
+      });
+
+      var correctCount = currentSlots.filter(function (s) { return s.state === 'correct'; }).length;
+      if (correctCount === item.words.length) {
+        var check = document.createElement('span');
+        check.className = 'completion-check';
+        check.textContent = '✅';
+        elSentenceLa.appendChild(check);
+      }
+    }
+
+    function checkCompletion(item, index) {
+      var correctCount = currentSlots.filter(function (s) { return s.state === 'correct'; }).length;
+      if (correctCount === item.words.length) {
+        updateProgress(index + 1);
+        elNextBtn.classList.add('visible');
+        elNextBtn.focus();
+      }
+    }
+
+    function buildWordChunk(w, item) {
+      var chunk = document.createElement('div');
+      chunk.className = 'chunk';
+
+      var label = document.createElement('div');
+      label.className = 'chunk-label';
+      label.textContent = w.lemma + ', ' + w.gen;
+      chunk.appendChild(label);
+
+      var target = document.createElement('div');
+      target.className = 'case-target';
+      target.textContent = 'Buscá el caso y número correctos:';
+      chunk.appendChild(target);
+
+      var table = document.createElement('table');
+      table.className = 'decl-table';
+      table.setAttribute('aria-label', 'Declinación de ' + w.lemma);
+
+      var headRow = document.createElement('tr');
+      ['Caso', 'Singular', 'Plural'].forEach(function (h) {
+        var th = document.createElement('th');
+        th.scope = 'col';
+        th.textContent = h;
+        headRow.appendChild(th);
+      });
+      table.appendChild(headRow);
+
+      var forms = declinar(w.lemma);
+
+      for (var i = 0; i < 5; i++) {
+        var tr = document.createElement('tr');
+
+        var tdCase = document.createElement('td');
+        tdCase.className = 'case-cell';
+        var abbr = document.createElement('span');
+        abbr.className = 'case-abbr';
+        abbr.textContent = caseLabels[i];
+        var help = document.createElement('span');
+        help.className = 'case-help';
+        help.textContent = caseHelps[i];
+        tdCase.appendChild(abbr);
+        tdCase.appendChild(help);
+        tr.appendChild(tdCase);
+
+        [false, true].forEach(function (plural) {
+          var td = document.createElement('td');
+          td.className = 'form-td';
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'form-cell';
+          var form = forms[plural ? this.i + 5 : this.i];
+          var txt = document.createElement('span');
+          txt.className = 'form-text';
+          txt.textContent = form;
+          btn.appendChild(txt);
+          btn.dataset.caseIndex = String(this.i);
+          btn.dataset.isPlural = String(plural);
+          btn.setAttribute('aria-label', form + ', ' + indexToCase(this.i, plural));
+          td.appendChild(btn);
+          tr.appendChild(td);
+        }, { i: i });
+
+        table.appendChild(tr);
+      }
+
+      chunk.appendChild(table);
+
+      var feedbackHint = document.createElement('div');
+      feedbackHint.className = 'feedback-hint';
+      chunk.appendChild(feedbackHint);
+
+      // Manejo de clic (compartido entre las celdas de este bloque)
+      var cells = table.querySelectorAll('.form-cell');
+      Array.prototype.forEach.call(cells, function (cell) {
+        cell.addEventListener('click', function () {
+          if (currentSlots[w.slotIndex].state === 'correct') { return; }
+
+          Array.prototype.forEach.call(cells, function (c) {
+            c.classList.remove('cell-correct', 'cell-incorrect');
+          });
+          feedbackHint.className = 'feedback-hint';
+          feedbackHint.textContent = '';
+
+          var idxCase = parseInt(cell.dataset.caseIndex, 10);
+          var isPlural = cell.dataset.isPlural === 'true';
+          var chosenCaseFull = indexToCase(idxCase, isPlural);
+          var correctCaseFull = w.case;
+          var chosenForm = cell.querySelector('.form-text').textContent;
+
+          if (chosenCaseFull === correctCaseFull) {
+            cell.classList.add('cell-correct');
+            if (!erroredSlots[w.slotIndex]) { stats.firstTry++; }
+            currentSlots[w.slotIndex] = { state: 'correct', text: chosenForm };
+            elSrStatus.textContent = 'Correcto: ' + chosenForm + '.';
+          } else {
+            cell.classList.add('cell-incorrect');
+            erroredSlots[w.slotIndex] = true;
+            currentSlots[w.slotIndex] = { state: 'incorrect', text: chosenForm };
+
+            var hint;
+            // ¿Acertó el caso pero erró el número?
+            if (correctCaseFull.indexOf(caseNames[idxCase]) === 0) {
+              hint = 'Revisá el número gramatical (singular o plural).';
+            } else {
+              hint = 'Necesitamos ' + w.syntaxSpan + '.';
+            }
+            feedbackHint.textContent = '💡 ' + hint;
+            feedbackHint.classList.add('error');
+            elSrStatus.textContent = 'Incorrecto. ' + hint;
+          }
+
+          renderSlots();
+          checkCompletion(item, currentIndex);
+        });
+      });
+
+      return chunk;
+    }
+
+    function loadItem(index) {
+      elNextBtn.classList.remove('visible');
+      elTables.textContent = '';
+      erroredSlots = {};
+      elSrStatus.textContent = '';
+
+      var item = items[index];
+
+      // Oración en español (en bloques)
+      elSentenceEs.textContent = '';
+      var num = document.createElement('span');
+      num.className = 'es-num';
+      num.textContent = (index + 1) + '.';
+      elSentenceEs.appendChild(num);
+      item.es.forEach(function (chunk) {
+        var span = document.createElement('span');
+        span.className = 'es-chunk';
+        if (chunk && typeof chunk === 'object') {
+          span.textContent = chunk.t;
+          if (chunk.verb) { span.classList.add('es-verb'); }
+        } else {
+          span.textContent = chunk;
+        }
+        elSentenceEs.appendChild(span);
+      });
+
+      updateProgress(index);
+
+      // Huecos del latín
+      currentSlots = item.laWords.map(function (wd) {
+        if (wd.isNoun) { return { state: 'empty', text: '_____' }; }
+        return { state: 'fixed', text: wd.text, isVerb: !!wd.isVerb };
+      });
+      renderSlots();
+
+      // Bloques con tablas
+      item.words.forEach(function (w) {
+        elTables.appendChild(buildWordChunk(w, item));
+      });
+
+      window.scrollTo({ top: 0, behavior: prefersReduced ? 'auto' : 'smooth' });
+    }
+
+    function finish() {
+      elQuiz.hidden = true;
+      updateProgress(items.length);
+      elSummary.textContent = 'Resolviste ' + stats.firstTry + ' de ' + stats.total + ' formas al primer intento.';
+      elCompletion.hidden = false;
+      elRestartBtn.focus();
+    }
+
+    function startGame() {
+      currentIndex = 0;
+      stats = { total: totalSlots(), firstTry: 0 };
+      elStart.hidden = true;
+      elCompletion.hidden = true;
+      elQuiz.hidden = false;
+      loadItem(0);
+    }
+
+    // Eventos
+    elStartBtn.addEventListener('click', startGame);
+    elRestartBtn.addEventListener('click', startGame);
+    elNextBtn.addEventListener('click', function () {
+      currentIndex++;
+      if (currentIndex < items.length) {
+        loadItem(currentIndex);
+      } else {
+        finish();
+      }
+    });
+  })();
+  </script>
+</body>
+</html>
