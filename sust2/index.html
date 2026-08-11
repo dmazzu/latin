@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carcania - Práctica de Latín</title>
+    <title>Minijuego. Sustantivos de 1.ª y 2.ª declinación</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,20 +11,20 @@
     <div class="lm-container">
         <!-- MENÚ PRINCIPAL -->
         <div id="lm-menu-screen">
-            <h1>Carcania</h1>
-            <h2>Academia de Latín - Panel de Práctica</h2>
+            <h1>Latín</h1>
+            <h2>Panel de práctica</h2>
             
             <div class="lm-menu-form">
                 
                 <div class="lm-form-group">
-                    <label>Foco Gramatical (Selecciona uno o varios):</label>
+                    <label>Temas a practicar:</label>
                     <div class="checkbox-group" style="background: #252525; padding: 15px; border-radius: 4px; border: 1px solid #444; display: flex; flex-direction: column; gap: 10px;">
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel1" checked> Nivel 1: SVO Básico (Nom / Acus)</label>
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_gen"> Nivel 2: Genitivo (Posesión/Relación)</label>
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_abl_prep"> Nivel 2: Ablativo de lugar (in + abl)</label>
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_abl_inst"> Nivel 2: Ablativo Instrumental</label>
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_dat"> Nivel 2: Dativo (Objeto Indirecto)</label>
-                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_equativa"> Nivel 2: Oraciones Ecuativas (sum/esse)</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel1" checked> Nivel 1: SVO básico (nom / acus)</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_gen"> Nivel 2: Genitivo (posesión/relación)</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_abl_prep"> Nivel 2: Ablativo de lugar en (in + abl)</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_abl_inst"> Nivel 2: Ablativo instrumental</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_dat"> Nivel 2: Dativo (objeto indirecto)</label>
+                        <label style="color: #eee; font-weight: normal; cursor: pointer;"><input type="checkbox" name="category" value="nivel2_equativa"> Nivel 2: Oraciones ecuativas (sum/esse)</label>
                     </div>
                 </div>
 
@@ -40,7 +40,7 @@
                 </div>
             </div>
             
-            <button id="lm-btn-start" class="lm-btn-start">Comenzar Práctica</button>
+            <button id="lm-btn-start" class="lm-btn-start">Comenzar práctica</button>
         </div>
 
         <!-- PANTALLA DE JUEGO -->
@@ -49,7 +49,7 @@
                 <h2>Panel de Práctica</h2>
                 <div>
                     <span id="lm-progress" class="lm-progress">Ejercicio 1 / 10</span>
-                    <button id="lm-btn-return-menu" class="lm-btn lm-btn-menu" style="margin-left: 15px;">Volver al Menú</button>
+                    <button id="lm-btn-return-menu" class="lm-btn lm-btn-menu" style="margin-left: 15px;">Volver al menú</button>
                 </div>
             </div>
 
